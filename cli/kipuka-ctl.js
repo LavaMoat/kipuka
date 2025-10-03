@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import { spawnSync } from "child_process";
-import { existsSync } from "fs";
-import { cp, mkdir } from "fs/promises";
-import { join } from "path";
+import { spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { cp, mkdir, readFile, appendFile } from "node:fs/promises";
+import { join } from "node:path";
 import { parseArgs } from "node:util";
 import {
   globalConfigDir,
@@ -97,7 +97,7 @@ const commands = {
       console.log("Empty output from docker images.");
     }
   },
-  async init(options={}) {
+  async init(options = {}) {
     if (!existsSync(globalConfigDir) || options.force) {
       await mkdir(globalConfigDir, { recursive: true });
       const dotFolder = join(import.meta.dirname, "..", "dot");
@@ -127,7 +127,9 @@ const commands = {
         );
       }
     } else {
-      console.log("~/.kipuka directory already exists. Add --force to override.");
+      console.log(
+        "~/.kipuka directory already exists. Add --force to override."
+      );
     }
   },
   async alias(options = {}) {
@@ -152,6 +154,29 @@ const commands = {
         stdio: "inherit",
         shell: true,
       });
+    }
+  },
+  async vaccinate() {
+    const config = await readGlobalConfig();
+    if (!config) {
+      throw new Error(`No global config found at ${globalConfigDir}`);
+    }
+    const vaccine = `
+# LavaMoat vaccine
+ignore-scripts=true
+git=${globalConfigDir}/gitwrap
+`;
+    // append vaccine to ~/.npmrc if not already present
+    const npmrcPath = join(process.env.HOME, ".npmrc");
+    let npmrc = "";
+    if (existsSync(npmrcPath)) {
+      npmrc = await readFile(npmrcPath, "utf8");
+    }
+    if (!npmrc.includes(vaccine)) {
+      await appendFile(npmrcPath, vaccine);
+      console.log(`Appended vaccine to ${npmrcPath}`);
+    } else {
+      console.log(`Vaccine already present in ${npmrcPath}`);
     }
   },
   async help() {

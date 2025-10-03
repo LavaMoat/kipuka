@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Examples of how this script is called:
+# --no-replace-objects ls-remote https://github.com/lavamoat/kipuka.git      
+# --no-replace-objects clone https://github.com/lavamoat/kipuka.git /home/naugtur/.npm/_cacache/tmp/git-clonegDDMzn --recurse-submodules --depth=1   
+# --no-replace-objects clone https://github.com/lavamoat/kipuka.git /home/naugtur/.npm/_cacache/tmp/git-cloneLo24OB --recurse-submodules --depth=1   
+
+is_clone=false
+clone_destination=""
+
+for arg in "$@"; do
+    if [ "$arg" = "clone" ]; then
+        is_clone=true
+        break
+    fi
+done
+
+if [ "$is_clone" = true ]; then
+    for arg in "$@"; do
+        if echo "$arg" | grep -q "/git-clone"; then
+            clone_destination="$arg"
+            break
+        fi
+    done
+fi
+
+git "$@"
+
+if [ "$is_clone" = true ] && [ -n "$clone_destination" ]; then
+
+    if [ -f "$clone_destination/package.json" ]; then
+      ## no need to rely on jq or similar if we know we have node
+        node -e "const fs=require('fs'),p='$clone_destination/package.json',d=JSON.parse(fs.readFileSync(p));delete d.scripts;fs.writeFileSync(p,JSON.stringify(d,null,2))"
+    fi
+
+fi
