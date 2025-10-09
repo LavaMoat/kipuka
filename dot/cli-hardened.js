@@ -4,7 +4,8 @@ import {
   without,
   withHelp,
   withFile,
-  withEntrypoint,
+  requireExtensions,
+  withCliWrapEntrypoint,
   withNpmPackages,
   withRuns,
   withOfflineOption,
@@ -47,8 +48,7 @@ export default [
   ]),
   withOfflineOption("k-offline"),
   withNodePermsOption(),
-  withFile("/root/.npmrc", npmrc),
   withFile("/home/node/.npmrc", npmrc),
-  withNpmPackages(["npq"]),
-  withEntrypoint("npq"),
+  ...requireExtensions("cli"),
+  withCliWrapEntrypoint()
 ];
