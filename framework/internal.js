@@ -40,20 +40,19 @@ export const globalConfigDir = join(homedir(), ".kipuka");
 
 /**
  * Read the global config file
- * @returns {KipukasGlobalConfig}
+ * @returns {Promise<KipukasGlobalConfig>}
  */
-export const readGlobalConfig = () => {
+export const readGlobalConfig = async () => {
   const configPath = join(globalConfigDir, "kipuka.config.js");
-  const require = createRequire(import.meta.url); // just because I've kept all of it sync and don't want to refactor
 
   if (!existsSync(configPath)) {
     throw Error('Config file not found. Run "kipukas init" first.');
   }
 
   try {
-    const conf = require(configPath);
-    return conf.default || conf
+    const conf = await import(configPath);
+    return conf.default || conf;
   } catch (error) {
-    throw Error("Failed to read config:", error.message);
+    throw error;
   }
 };
