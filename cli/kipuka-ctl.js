@@ -22,7 +22,7 @@ const executeDockerCommand = async (args, description) => {
     if (result.status !== 0) {
       console.error(
         `Failed to execute: docker ${args.join(" ")}`,
-        result.stderr.toString()
+        result.stderr.toString(),
       );
     }
   } else {
@@ -49,17 +49,17 @@ const commands = {
       if (containers.length > 0) {
         console.log(
           `Found ${containers.length} kipuka containers: ${containers.join(
-            ", "
-          )}`
+            ", ",
+          )}`,
         );
         for (const container of containers) {
           await executeDockerCommand(
             ["stop", container],
-            `Stop container ${container}`
+            `Stop container ${container}`,
           );
           await executeDockerCommand(
             ["rm", container],
-            `Remove container ${container}`
+            `Remove container ${container}`,
           );
         }
       } else {
@@ -85,7 +85,7 @@ const commands = {
         .filter(Boolean);
       if (images.length > 0) {
         console.log(
-          `Found ${images.length} kipuka images: ${images.join(", ")}`
+          `Found ${images.length} kipuka images: ${images.join(", ")}`,
         );
         for (const image of images) {
           await executeDockerCommand(["rmi", image], `Remove image ${image}`);
@@ -103,7 +103,7 @@ const commands = {
       const dotFolder = join(import.meta.dirname, "..", "dot");
       if (!existsSync(dotFolder)) {
         throw new Error(
-          `Config template missing from package. Expected to find it here: '${dotFolder}'`
+          `Config template missing from package. Expected to find it here: '${dotFolder}'`,
         );
       }
 
@@ -113,7 +113,7 @@ const commands = {
 
       console.log(`Created global config at ${globalConfigDir}`);
       console.log(
-        `Linking @lavamoat/kipuka to ${globalConfigDir} as a dependency`
+        `Linking @lavamoat/kipuka to ${globalConfigDir} as a dependency`,
       );
 
       const linkResult = spawnSync("npm", ["link", "@lavamoat/kipuka"], {
@@ -123,12 +123,12 @@ const commands = {
 
       if (linkResult.status !== 0) {
         console.error(
-          "Failed to link kipuka package. You may need to do it manually."
+          "Failed to link kipuka package. You may need to do it manually.",
         );
       }
     } else {
       console.log(
-        "~/.kipuka directory already exists. Add --force to override."
+        "~/.kipuka directory already exists. Add --force to override.",
       );
     }
   },
@@ -149,7 +149,7 @@ const commands = {
 
     for (const alias of aliases) {
       const aliasLine = `${alias}='kipuka ${use} --k-wrap-cli=${alias}'`;
-      console.log(`alias ${aliasLine}`);
+      console.log(`alias ${aliasLine};`);
       spawnSync("alias", [aliasLine], {
         stdio: "inherit",
         shell: true,
