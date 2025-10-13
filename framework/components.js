@@ -50,12 +50,12 @@ export const withOfflineOption = (optName) => ({
   }),
 });
 
-export const withParentHost = () => ({
+export const withParentHost = (name) => ({
   id: "withParentHost",
   options: [],
   handler: () => ({
     runArgsTransforms: [
-      (args) => [`--add-host`, `parent.host:host-gateway`, ...args],
+      (args) => [`--add-host`, `${name || "parent.host"}:host-gateway`, ...args],
     ],
   }),
 });
