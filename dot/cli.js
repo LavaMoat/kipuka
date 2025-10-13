@@ -6,12 +6,14 @@ import {
   withCliWrapEntrypoint,
   requireExtensions,
   withHelp,
+  withParentHost,
   withNpmPackages,
 } from "@lavamoat/kipuka";
 
 export default [
   ...without(kipuka, ["withEntrypoint", "withHelp"]),
   withNpmPackages(["npm@latest"]),
+  withParentHost(),
   withDefaults({
     name: "cli",
   }),

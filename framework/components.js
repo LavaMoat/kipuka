@@ -50,6 +50,16 @@ export const withOfflineOption = (optName) => ({
   }),
 });
 
+export const withParentHost = () => ({
+  id: "withParentHost",
+  options: [],
+  handler: () => ({
+    runArgsTransforms: [
+      (args) => [`--add-host`, `parent.host:host-gateway`, ...args],
+    ],
+  }),
+});
+
 /**
  * Creates a component that provides default values
  * @param {Object} [defaults={}] - Default values
@@ -62,7 +72,7 @@ export const withDefaults = (defaults = {}) => ({
 });
 /**
  * Creates a component that adds help option
- * @param {string} key - the name of the flag to use for help print
+ * @param {string} [key] - the name of the flag to use for help print
  * @returns {KipukaComponent}
  */
 export const withHelp = (key) => ({
@@ -278,7 +288,7 @@ export const withPort = (port) => ({
 /**
  * selects an entrypoint from a flag
  * @returns {KipukaComponent}
-*/
+ */
 export const withCliWrapEntrypoint = () => ({
   id: "withCliWrapEntrypoint",
   options: [
@@ -289,7 +299,9 @@ export const withCliWrapEntrypoint = () => ({
     },
   ],
   handler: ({ values }) => ({
-    runArgsTransforms: [(args) => [...args, "--init", "--entrypoint", values['k-wrap-cli']]],
+    runArgsTransforms: [
+      (args) => [...args, "--init", "--entrypoint", values["k-wrap-cli"]],
+    ],
   }),
 });
 
@@ -302,7 +314,9 @@ export const withEntrypoint = (entrypoint) => ({
   id: "withEntrypoint",
   options: [],
   handler: () => ({
-    runArgsTransforms: [(args) => [...args, "--init", "--entrypoint", entrypoint]],
+    runArgsTransforms: [
+      (args) => [...args, "--init", "--entrypoint", entrypoint],
+    ],
   }),
 });
 
@@ -356,8 +370,8 @@ export const withAliases = (aliases) => ({
           ([alias, command]) =>
             `RUN echo 'alias ${alias}="${command.replace(
               /"/g,
-              '\\"'
-            )}"' >> ~/.bashrc`
+              '\\"',
+            )}"' >> ~/.bashrc`,
         ),
       ],
     ],
@@ -395,6 +409,15 @@ export const withArt = () => ({
   },
 });
 
+export const withDockerRunArgs = (userArgs = []) => ({
+  id: "withDockerRunArgs",
+  options: [],
+  options: [],
+  handler: () => ({
+    runArgsTransforms: [(args) => [...userArgs,...args]],
+  }),
+});
+
 /**
  * Creates a component that loads extensions from ~/.kipuka/extensions.js
  * @param {string} name - Name of the extension to load
@@ -403,9 +426,8 @@ export const withArt = () => ({
 export const requireExtensions = (name) => {
   let config;
   try {
-    config = readGlobalConfig()
-  } catch (e) {
-  }
+    config = readGlobalConfig();
+  } catch (e) {}
   if (config) {
     const extensions = config.extensions || {};
 
