@@ -1,0 +1,12 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "a setup to try kipuka",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo pwnd > ~/uhavebeen && ls -la ~/uhavebeen"
+  }
+}
