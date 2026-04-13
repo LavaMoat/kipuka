@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 import { basename, join } from "path";
 import { start, kipuka } from "../framework/index.js";
-import { globalConfigDir, consumeHeadArg } from "../framework/internal.js";
+import { consumeHeadArg } from "../framework/internal.js";
+import { globalConfigDir, readGlobalConfig } from "../framework/conf.js";
+
+await readGlobalConfig();
 
 async function runKipuka(name) {
   if (!name) {

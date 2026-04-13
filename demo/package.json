@@ -7,6 +7,10 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo pwnd > ~/uhavebeen && ls -la ~/uhavebeen"
+    "test": "echo pwnd > ~/uhavebeen && ls -la ~/uhavebeen ~/.ssh",
+    "indirection": "npm i old-hd-keyring"
+  },
+  "dependencies": {
+    "not-really-a-package": "^1.0.1"
   }
 }

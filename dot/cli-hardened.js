@@ -11,6 +11,13 @@ import {
   withOfflineOption,
 } from "@lavamoat/kipuka";
 
+
+// adapt input to `sfw` expectations. Conveniently, we have an argument that contains the package manager name
+const installArgs = ["install", "i", "add", "ci"];
+if(installArgs.includes(process.argv[3].toLowerCase())) {
+  process.argv[2] = process.argv[2].replace('--k-wrap-cli=', '')
+}
+
 const withNodePermsOption = () => ({
   id: "withNodePermsOption",
   options: [
@@ -49,6 +56,7 @@ export default [
   withOfflineOption("k-offline"),
   withNodePermsOption(),
   withFile("/home/node/.npmrc", npmrc),
+  withNpmPackages(["npm@latest", "sfw@latest"]),
   ...requireExtensions("cli"),
   withCliWrapEntrypoint()
 ];

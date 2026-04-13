@@ -5,10 +5,12 @@ import { cp, mkdir, readFile, appendFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import {
-  globalConfigDir,
-  readGlobalConfig,
   promptUser,
 } from "../framework/internal.js";
+
+import { readGlobalConfig, globalConfigDir} from "../framework/conf.js";
+
+await readGlobalConfig();
 
 /**
  * Execute Docker command with user confirmation
@@ -133,7 +135,6 @@ const commands = {
     }
   },
   async alias(options = {}) {
-    const config = await readGlobalConfig();
     let aliases;
     if (options.set) {
       aliases = options.set.split(",");
@@ -150,14 +151,9 @@ const commands = {
     for (const alias of aliases) {
       const aliasLine = `${alias}='kipuka ${use} --k-wrap-cli=${alias}'`;
       console.log(`alias ${aliasLine};`);
-      spawnSync("alias", [aliasLine], {
-        stdio: "inherit",
-        shell: true,
-      });
     }
   },
   async vaccinate() {
-    const config = await readGlobalConfig();
     if (!config) {
       throw new Error(`No global config found at ${globalConfigDir}`);
     }

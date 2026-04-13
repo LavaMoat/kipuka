@@ -6,7 +6,9 @@
   "exports": {
     ".": "./framework/index.js"
   },
-  "scripts": {},
+  "scripts": {
+    "docs": "node gen-docs.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lavamoat/kipuka.git"

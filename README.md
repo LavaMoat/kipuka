@@ -146,7 +146,9 @@ Run it with `kipuka <name>`
 
 ### Available Components
 
-TBD, see components.js or let your IDE list what you can import
+Your IDE should help you because they're typed, see the `with*` you can import.
+
+Brief documentation for reference: [components.md](./components.md)
 
 ## How It Works
 
@@ -167,7 +169,7 @@ Your files stay on the host, but the execution environment is isolated.
 No warranty of any kind, as the MIT license says.
 
 This isn't a military-grade solution. Container escape vulnerabilities exist.  
-There are attacks that this will not defend from (see other lavamoat tools).  
+There are attacks that this will not defend from (see other lavamoat tools BTW).  
 This is a tool that optimizes for ease of use and no changes to your existing workflow. 
 
 When escaping a bear, you don't have to outrun the bear, just the person next to you.

@@ -2,10 +2,10 @@
 /** @typedef {import('./types').KipukaOption} KipukaOption */
 /** @typedef {import('./types').KipukaConfig} KipukaConfig */
 
-import { basename, join } from "node:path";
-import { readGlobalConfig } from "./internal.js";
+import { config } from "./conf.js";
 
 /**
+ * Creates a component that mounts the current directory into the container
  * @param {string} [path="/mountpoint"] - Path to mount
  * @param {string} [user="node"] - User to own the mountpoint
  * @returns {KipukaComponent}
@@ -286,7 +286,7 @@ export const withPort = (port) => ({
 });
 
 /**
- * selects an entrypoint from a flag
+ * Selects an entrypoint from a flag
  * @returns {KipukaComponent}
  */
 export const withCliWrapEntrypoint = () => ({
@@ -300,13 +300,20 @@ export const withCliWrapEntrypoint = () => ({
   ],
   handler: ({ values }) => ({
     runArgsTransforms: [
-      (args) => [...args, "--init", "--entrypoint", values["k-wrap-cli"]],
+      (args) => {
+        const cli = values["k-wrap-cli"];
+        if (!cli) {
+          return args;
+        }
+        process.argv = process.argv.filter((arg) => !arg.startsWith("--k-wrap-cli="));
+        return [...args, "--init", "--entrypoint", cli]
+      },
     ],
   }),
 });
 
 /**
- * selects an entrypoint
+ * Selects an entrypoint for the docker container
  * @param {string} entrypoint - Port number to expose
  * @returns {KipukaComponent}
  */
@@ -409,9 +416,13 @@ export const withArt = () => ({
   },
 });
 
+/**
+ * Creates a component that adds user-provided Docker run arguments
+ * @param {string[]} userArgs - User-provided Docker run arguments
+ * @returns {KipukaComponent}
+ */
 export const withDockerRunArgs = (userArgs = []) => ({
   id: "withDockerRunArgs",
-  options: [],
   options: [],
   handler: () => ({
     runArgsTransforms: [(args) => [...userArgs,...args]],
@@ -419,15 +430,11 @@ export const withDockerRunArgs = (userArgs = []) => ({
 });
 
 /**
- * Creates a component that loads extensions from ~/.kipuka/extensions.js
+ * Loads extensions from ~/.kipuka/extensions.js and returns them assuming they're a list of components.
  * @param {string} name - Name of the extension to load
  * @returns {KipukaComponent[]}
  */
 export const requireExtensions = (name) => {
-  let config;
-  try {
-    config = readGlobalConfig();
-  } catch (e) {}
   if (config) {
     const extensions = config.extensions || {};
 
