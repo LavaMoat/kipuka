@@ -10,7 +10,7 @@ import {
 
 import { readGlobalConfig, globalConfigDir} from "../framework/conf.js";
 
-await readGlobalConfig();
+const config = await readGlobalConfig();
 
 /**
  * Execute Docker command with user confirmation
