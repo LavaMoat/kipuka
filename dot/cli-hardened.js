@@ -46,6 +46,7 @@ prefix=/home/node/.npm-packages
 export default [
   ...without(kipuka, ["withEntrypoint", "withHelp"]),
   withDefaults({
+    from: "dhi.io/node:25-debian13-sfw-dev",
     name: "cli-hrd",
   }),
   withHelp("k-help"),
