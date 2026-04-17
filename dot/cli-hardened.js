@@ -57,7 +57,7 @@ export default [
   withOfflineOption("k-offline"),
   withNodePermsOption(),
   withFile("/home/node/.npmrc", npmrc),
-  withNpmPackages(["npm@latest", "sfw@latest"]),
+  withNpmPackages(["npm@latest", "sfw@latest", "pnpm@latest"]),
   ...requireExtensions("cli"),
   withCliWrapEntrypoint()
 ];

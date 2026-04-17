@@ -12,7 +12,7 @@ import {
 
 export default [
   ...without(kipuka, ["withEntrypoint", "withHelp"]),
-  withNpmPackages(["npm@latest"]),
+  withNpmPackages(["npm@latest","pnpm@latest"]),
   withParentHost(),
   withDefaults({
     name: "cli",
