@@ -34,7 +34,7 @@ export const withMountpoint = (path = "/mountpoint", user) => ({
  * Creates a component that adds offline mode option
  * @returns {KipukaComponent}
  */
-export const withOfflineOption = (optName) => ({
+export const withOfflineOption = (optName = "offline") => ({
   id: "withOfflineOption",
   options: [
     {
@@ -44,7 +44,7 @@ export const withOfflineOption = (optName) => ({
     },
   ],
   handler: ({ values }) => ({
-    runArgsTransforms: values.offline
+    runArgsTransforms: values[optName]
       ? [(args) => [...args, "--network", "none"]]
       : [],
   }),
@@ -75,7 +75,7 @@ export const withDefaults = (defaults = {}) => ({
  * @param {string} [key] - the name of the flag to use for help print
  * @returns {KipukaComponent}
  */
-export const withHelp = (key) => ({
+export const withHelp = (key = "help") => ({
   id: "withHelp",
   options: [
     {
@@ -85,7 +85,7 @@ export const withHelp = (key) => ({
     },
   ],
   handler: ({ values, options = [] }) => {
-    if (values.help) {
+    if (values[key]) {
       console.log(`Usage:
 kipuka -- [OPTIONS]
 kipuka run [NAME] -- [OPTIONS]
@@ -135,18 +135,23 @@ export const withPackagesOption = () => ({
       description: "Comma-separated list of packages to install with apt",
     },
   ],
-  handler: ({ values }) => ({
-    imageTransforms: values.packages
-      ? [
-          (setup) => [
-            `RUN apt update && apt install -y ${values.packages
-              .split(",")
-              .join(" ")}`,
-            ...setup,
-          ],
-        ]
-      : [],
-  }),
+  handler: ({ values }) => {
+    if (values.apt && !values["kipuka-rebuild"]) {
+      console.warn("Warning: --apt needs --kipuka-rebuild to take effect (packages are baked into the image)");
+    }
+    return {
+      imageTransforms: values.apt
+        ? [
+            (setup) => [
+              `RUN apt update && apt install -y ${values.apt
+                .split(",")
+                .join(" ")}`,
+              ...setup,
+            ],
+          ]
+        : [],
+    };
+  },
 });
 /**
  * Creates a component that adds package installation option
@@ -161,16 +166,21 @@ export const withNpmPackagesOption = () => ({
       description: "Comma-separated list of packages to install with npm -g",
     },
   ],
-  handler: ({ values }) => ({
-    imageTransforms: values.packages
-      ? [
-          (setup) => [
-            `RUN npm install -g ${values.packages.split(",").join(" ")}`,
-            ...setup,
-          ],
-        ]
-      : [],
-  }),
+  handler: ({ values }) => {
+    if (values.npm && !values["kipuka-rebuild"]) {
+      console.warn("Warning: --npm needs --kipuka-rebuild to take effect (packages are baked into the image)");
+    }
+    return {
+      imageTransforms: values.npm
+        ? [
+            (setup) => [
+              `RUN npm install -g ${values.npm.split(",").join(" ")}`,
+              ...setup,
+            ],
+          ]
+        : [],
+    };
+  },
 });
 
 /**
