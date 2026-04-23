@@ -86,7 +86,7 @@ export const start = (handlers) => {
     },
     ...handlers.flatMap((handler) => handler.options),
   ];
-  const { values, positionals } = parseArgs({
+  const { values, positionals, tokens } = parseArgs({
     options: Object.fromEntries(
       allOptions.map(({ name, type, description }) => [
         name,
@@ -95,7 +95,17 @@ export const start = (handlers) => {
     ),
     allowPositionals: true,
     strict: false,
+    tokens: true,
   });
+
+  // Find where positional args start in process.argv and pass everything
+  // from there onward to the container command. This ensures flags like
+  // --save-dev that parseArgs consumes into `values` still reach the container.
+  const firstPositionalToken = tokens.find((t) => t.kind === "positional");
+  // token.index is relative to the args array (process.argv.slice(2))
+  const passthroughArgs = firstPositionalToken
+    ? process.argv.slice(firstPositionalToken.index + 2)
+    : [];
 
   /** @type {KipukaConfig[]} */
   const results = handlers
@@ -115,7 +125,7 @@ export const start = (handlers) => {
       baseDockerArgs
     ),
     imageName,
-    ...positionals,
+    ...passthroughArgs,
   ];
 
   if (values['kipuka-dry-run']) {
