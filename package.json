@@ -34,6 +34,7 @@
   ],
   "homepage": "https://github.com/lavamoat/kipuka#readme",
   "description": "Easy, composable and transparent way to run things in a docker container.",
+  "packageManager": "pnpm@11.0.0-rc.5+sha512.c469fb6aa13a99e57aec935cd7b86ff422701f4602ecac2231d3dc20910586ebfb6b50a7b455d0778ec22ae56912d8d8e88e9f9e0a03c0875a6a41783a94a1bd",
   "bin": {
     "kipuka": "./cli/kipuka.js",
     "kipuka-ctl": "./cli/kipuka-ctl.js"
