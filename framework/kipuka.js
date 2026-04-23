@@ -11,6 +11,7 @@ import {
   withMountpoint,
   withUser,
   withEntrypoint,
+  withCorepack,
   requireExtensions,
 } from "./index.js";
 
@@ -22,6 +23,7 @@ export default [
   withArt(),
   withHelp(),
   withInteractive(),
+  withCorepack(),
   withPackagesOption(),
   withNpmPackagesOption(),
   withOfflineOption(),

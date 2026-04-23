@@ -12,5 +12,7 @@
   },
   "dependencies": {
     "not-really-a-package": "^1.0.1"
-  }
+  },
+  "//": "both npm and yarn can be used, this points to modern yarn for testing how corepack works it out",
+  "packageManager": "yarn@4.12.0"
 }

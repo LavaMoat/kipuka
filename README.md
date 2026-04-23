@@ -161,10 +161,19 @@ Kipuka creates isolated Docker containers for running CLI tools and development 
 Your files stay on the host, but the execution environment is isolated.
 
 
+# Known limitations
+
+Upgrading to a new version with breaking changes requires:
+
+- running `kipuka-ctl init --force`
+- rebuilding default images, eg. `kipuka -- --kipuka-rebuild` and `kipuka cli --kipuka-rebuild`
+
+A more streamlined process will emerge. Feel free to create an issue with suggestions.
+
 ---
 
 
-## Disclaimer
+# Disclaimer
 
 No warranty of any kind, as the MIT license says.
 

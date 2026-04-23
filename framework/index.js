@@ -47,7 +47,7 @@ const buildImage = (name, from, transformers = []) => {
   const dockerfile = composeDockerfile(from, transformers);
   const result = spawnSync("docker", ["build", "-t", name, "-"], {
     input: dockerfile,
-    stdio: "pipe",
+    stdio: ["pipe", "inherit", "inherit"],
     encoding: "utf8",
   });
 
@@ -111,7 +111,7 @@ export const start = (handlers) => {
 
   const finalDockerArgs = [
     ...finalConfig.runArgsTransforms.reduce(
-      (args, transform) => transform(args),
+      (args, transform) => transform(args, { name }),
       baseDockerArgs
     ),
     imageName,

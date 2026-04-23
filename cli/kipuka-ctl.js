@@ -102,6 +102,7 @@ const commands = {
   async init(options = {}) {
     if (!existsSync(globalConfigDir) || options.force) {
       await mkdir(globalConfigDir, { recursive: true });
+      await mkdir(join(globalConfigDir, "corepack-cache"), { recursive: true });
       const dotFolder = join(import.meta.dirname, "..", "dot");
       if (!existsSync(dotFolder)) {
         throw new Error(

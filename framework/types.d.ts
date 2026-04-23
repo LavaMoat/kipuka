@@ -13,6 +13,14 @@ export interface KipukaOption {
 }
 
 /**
+ * Context provided to runArgsTransforms functions
+ */
+export interface ArgsTransformContext {
+  /** Name of the kipuka */
+  name: string;
+}
+
+/**
  * Configuration for a kipuka (containerized environment)
  */
 export interface KipukaConfig {
@@ -29,7 +37,7 @@ export interface KipukaConfig {
    * Docker run arguments transformations - functions that modify docker run command arguments
    * Each function receives an array of arguments and returns the modified array
    */
-  runArgsTransforms?: Array<(args: string[]) => string[]>;
+  runArgsTransforms?: Array<(args: string[], context: ArgsTransformContext) => string[]>;
 }
 
 /**

@@ -29,6 +29,32 @@ export const withMountpoint = (path = "/mountpoint", user) => ({
     };
   },
 });
+/**
+ * Creates a component that sets up corepack in the container
+ * @returns {KipukaComponent}
+ */
+export const withCorepack = () => ({
+  id: "withCorepack",
+  options: [],
+  handler: () => {
+    return {
+      imageTransforms: [
+        (setup = []) => [
+          `ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0`,
+          `ENV COREPACK_HOME=/corepack-cache`,
+          `RUN mkdir -p /corepack-cache`,
+          `RUN chmod 777 /corepack-cache`,
+          `RUN npm install -g corepack`,
+          ...setup,
+          `RUN corepack enable`,
+        ],
+      ],
+      runArgsTransforms: [
+        (args, { name }) => ["-v", `${name}_corepack_cache:/corepack-cache`, ...args],
+      ],
+    };
+  },
+});
 
 /**
  * Creates a component that adds offline mode option
@@ -55,7 +81,11 @@ export const withParentHost = (name) => ({
   options: [],
   handler: () => ({
     runArgsTransforms: [
-      (args) => [`--add-host`, `${name || "parent.host"}:host-gateway`, ...args],
+      (args) => [
+        `--add-host`,
+        `${name || "parent.host"}:host-gateway`,
+        ...args,
+      ],
     ],
   }),
 });
@@ -137,7 +167,9 @@ export const withPackagesOption = () => ({
   ],
   handler: ({ values }) => {
     if (values.apt && !values["kipuka-rebuild"]) {
-      console.warn("Warning: --apt needs --kipuka-rebuild to take effect (packages are baked into the image)");
+      console.warn(
+        "Warning: --apt needs --kipuka-rebuild to take effect (packages are baked into the image)",
+      );
     }
     return {
       imageTransforms: values.apt
@@ -168,7 +200,9 @@ export const withNpmPackagesOption = () => ({
   ],
   handler: ({ values }) => {
     if (values.npm && !values["kipuka-rebuild"]) {
-      console.warn("Warning: --npm needs --kipuka-rebuild to take effect (packages are baked into the image)");
+      console.warn(
+        "Warning: --npm needs --kipuka-rebuild to take effect (packages are baked into the image)",
+      );
     }
     return {
       imageTransforms: values.npm
@@ -315,8 +349,10 @@ export const withCliWrapEntrypoint = () => ({
         if (!cli) {
           return args;
         }
-        process.argv = process.argv.filter((arg) => !arg.startsWith("--k-wrap-cli="));
-        return [...args, "--init", "--entrypoint", cli]
+        process.argv = process.argv.filter(
+          (arg) => !arg.startsWith("--k-wrap-cli="),
+        );
+        return [...args, "--init", "--entrypoint", cli];
       },
     ],
   }),
@@ -435,7 +471,7 @@ export const withDockerRunArgs = (userArgs = []) => ({
   id: "withDockerRunArgs",
   options: [],
   handler: () => ({
-    runArgsTransforms: [(args) => [...userArgs,...args]],
+    runArgsTransforms: [(args) => [...userArgs, ...args]],
   }),
 });
 
