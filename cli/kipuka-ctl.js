@@ -100,6 +100,11 @@ const commands = {
     }
   },
   async init(options = {}) {
+    const result = spawnSync("docker", ['--version'], { stdio: "ignore" });
+    if(result.error && result.error?.code === 'ENOENT') {
+      console.error("Docker is not installed or not in PATH. Please install Docker to use kipuka.");
+      process.exit(1);
+    }
     if (!existsSync(globalConfigDir) || options.force) {
       await mkdir(globalConfigDir, { recursive: true });
       await mkdir(join(globalConfigDir, "corepack-cache"), { recursive: true });
