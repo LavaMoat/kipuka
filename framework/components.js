@@ -2,6 +2,7 @@
 /** @typedef {import('./types').KipukaOption} KipukaOption */
 /** @typedef {import('./types').KipukaConfig} KipukaConfig */
 
+import { existsSync } from "node:fs";
 import { config } from "./conf.js";
 
 /**
@@ -25,6 +26,26 @@ export const withMountpoint = (path = "/mountpoint", user) => ({
       ],
       runArgsTransforms: [
         (args) => ["-v", `${process.cwd()}:${path}`, ...args],
+      ],
+    };
+  },
+});
+/**
+ * Creates a component that mounts a specific folder inside the container
+ * @param {string} path - Path to mount
+ * @param {string} [user="node"] - User to own the mountpoint
+ * @returns {KipukaComponent}
+ */
+export const withFolderFromHome = (path, user='node') => ({
+  id: "withFolderFromHome",
+  options: [],
+  handler: () => {
+    if(!path || !existsSync(`${process.env.HOME}/${path}`)) {
+      throw new Error(`Folder ${process.env.HOME}/${path} does not exist, cannot mount`);
+    }
+    return {
+      runArgsTransforms: [
+        (args) => ["-v", `${process.env.HOME}/${path}:/home/${user}/${path}`, ...args],
       ],
     };
   },
