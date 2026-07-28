@@ -2,19 +2,46 @@
 /** @typedef {import('./types').KipukaOption} KipukaOption */
 /** @typedef {import('./types').KipukaConfig} KipukaConfig */
 
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import nodePath from "node:path";
 import { config } from "./conf.js";
 
 /**
  * Creates a component that mounts the current directory into the container
  * @param {string} [path="/mountpoint"] - Path to mount
  * @param {string} [user="node"] - User to own the mountpoint
+ * @param {boolean} [addWorkspaceContext=true] - Whether to include parent directories for workspace context
  * @returns {KipukaComponent}
  */
-export const withMountpoint = (path = "/mountpoint", user) => ({
+export const withMountpoint = (
+  path = "/mountpoint",
+  user,
+  addWorkspaceContext = true,
+) => ({
   id: "withMountpoint",
   options: [],
   handler: () => {
+    const choosePathToMount = (dir) => {
+      if (!addWorkspaceContext) {
+        return dir;
+      }
+      let currentDir = dir;
+      const rootPath = nodePath.parse(dir).root;
+      while (currentDir !== rootPath) {
+        const packageJsonPath = nodePath.join(currentDir, "package.json");
+        if (existsSync(packageJsonPath)) {
+          const packageJson = JSON.parse(
+            readFileSync(packageJsonPath, "utf-8"),
+          );
+          if (packageJson.workspaces) {
+            return currentDir;
+          }
+        }
+        currentDir = nodePath.dirname(currentDir);
+      }
+      return dir;
+    };
+
     return {
       imageTransforms: [
         (setup = []) => [
@@ -25,7 +52,23 @@ export const withMountpoint = (path = "/mountpoint", user) => ({
         ],
       ],
       runArgsTransforms: [
-        (args) => ["-v", `${process.cwd()}:${path}`, ...args],
+        (args) => {
+          // figure out if cwd is a part of a workspace and if so, mount the workspace root and set workdir to the cwd nested in it
+          const cwd = process.cwd();
+          const workspaceRoot = choosePathToMount(cwd);
+
+          const cwdWithinWorkspaceRelative = nodePath.join(
+            path,
+            nodePath.relative(workspaceRoot, cwd),
+          );
+          return [
+            "-v",
+            `${workspaceRoot}:${path}`,
+            "--workdir",
+            cwdWithinWorkspaceRelative,
+            ...args,
+          ];
+        },
       ],
     };
   },
@@ -36,16 +79,22 @@ export const withMountpoint = (path = "/mountpoint", user) => ({
  * @param {string} [user="node"] - User to own the mountpoint
  * @returns {KipukaComponent}
  */
-export const withFolderFromHome = (path, user='node') => ({
+export const withFolderFromHome = (path, user = "node") => ({
   id: "withFolderFromHome",
   options: [],
   handler: () => {
-    if(!path || !existsSync(`${process.env.HOME}/${path}`)) {
-      throw new Error(`Folder ${process.env.HOME}/${path} does not exist, cannot mount`);
+    if (!path || !existsSync(`${process.env.HOME}/${path}`)) {
+      throw new Error(
+        `Folder ${process.env.HOME}/${path} does not exist, cannot mount`,
+      );
     }
     return {
       runArgsTransforms: [
-        (args) => ["-v", `${process.env.HOME}/${path}:/home/${user}/${path}`, ...args],
+        (args) => [
+          "-v",
+          `${process.env.HOME}/${path}:/home/${user}/${path}`,
+          ...args,
+        ],
       ],
     };
   },
@@ -71,7 +120,11 @@ export const withCorepack = () => ({
         ],
       ],
       runArgsTransforms: [
-        (args, { name }) => ["-v", `${name}_corepack_cache:/corepack-cache`, ...args],
+        (args, { name }) => [
+          "-v",
+          `${name}_corepack_cache:/corepack-cache`,
+          ...args,
+        ],
       ],
     };
   },
